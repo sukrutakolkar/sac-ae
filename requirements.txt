@@ -1,0 +1,11 @@
+numpy
+opencv-python
+
+swig
+pygame
+wandb
+gymnasium[box2d]
+
+--index-url https://download.pytorch.org/whl/cu128
+torch
+torchvision
