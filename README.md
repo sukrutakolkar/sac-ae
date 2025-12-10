@@ -6,11 +6,21 @@ My goal with this project was to understand Deep-RL/Actor-Critic models more clo
 
 ## Environments & Performance
 ### CarRacing-v3
-The primary goal was to learn vision encoding in Actor-Critic algorithms on a medium grade but also fun environment and CarRacing fit the bill. You can read more about the environment here - <link>.
+The primary goal was to learn vision encoding in Actor-Critic algorithms on a medium grade but also fun environment and CarRacing fit the bill. You can read more about the environment [here](https://gymnasium.farama.org/environments/box2d/car_racing/).
 The environment is considered solved when the model consistently reaches a score of **~900** per episode. The current implementation converges in **~800,000** environment steps. With Off-policy pretraining this can be reduced to **< 100k steps** (~4-5 hours), depending on the amount and quality of pretraining data. This can be further reduced, with an agressive learning rate but the policy will be unstable.
 
+![Agent's performance after approx. 120k steps with 5000 steps offpolicy pretraining](media/carracing.gif)
+
+![Evaluation performance averaged over 5 runs](media/eval_results_carracing.png)
+
+Performance shown above is with offpolicy pretraining and reward smoothing enabled.
+
 ### VisualPendulum
-A far simpler environment used for sanity checking, solved in ~10k steps. (30–40 mins).
+A far simpler environment used for sanity checking, solved in ~15k steps. (30–40 mins).
+
+![Agent's performance after approx. 20k steps](media/pendulum.gif)
+
+![Evaluation performance averaged over 5 runs](media/eval_results_pendulum.png)
 
 ## Code Structure
 * **`sac.py`**: Core logic for PixelSAC, Actor, and Critic.
@@ -62,6 +72,10 @@ I experimented with the following architectures, **none of which worked**:
 ### Issues
 #### Actor vs. Critic Losses
 The nature, magnitude, and variance of Actor vs. Critic losses are very different. The **Critic** tries to extract features for value estimation, while the **Actor** tries to maximize probability log-likelihoods. Joint training of the encoder therefore corrupts the CNN feature extractor, further collapsing both Actor and Critic training.
+
+![Actor's loss over 60k steps while training on CarRacing env](media/actor_loss.png)
+
+![Critic's loss over 60k steps while training on CarRacing env](media/critic_loss.png)
 
 #### Soft Updates and Inefficient Feature Extraction
 In using a shared CNN Backbone, there is also the issue of the target critic soft update over the critic's weights. This process is hampered by a constantly updating CNN encoder. This necessitates each component handling its own feature encoder.
